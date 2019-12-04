@@ -48,10 +48,11 @@ func AddTag(c *gin.Context) {
 	valid.Range(state, 0, 1, "state").Message("状态只允许0或1")
 	code := e.INVALID_PARAMS
 	msg := e.GetMsg(code)
-	if ! valid.HasErrors() {
-		if ! models.ExistTagByName(name) {
+	if !valid.HasErrors() {
+		if !models.ExistTagByName(name) {
 			code = e.SUCCESS
-			models.AddTag(name, state, createdBy)
+			err := models.AddTag(name, state, createdBy)
+			fmt.Printf("%+v \n",err)
 		} else {
 			code = e.ERROR_EXIST_TAG
 		}
