@@ -26,12 +26,12 @@ func GetTags(c *gin.Context) {
 		maps["state"] = state
 	}
 	code := e.SUCCESS
-	data["lists"] = models.GetTags(util.GetPage(c), setting.PageSize, maps)
+	data["lists"] = models.GetTags(util.GetPage(c), setting.AppSetting.PageSize, maps)
 	data["total"] = models.GetTagTotal(maps)
 	c.JSON(http.StatusOK, gin.H{
-		"code" : code,
-		"msg" : e.GetMsg(code),
-		"data" : data,
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": data,
 	})
 }
 
@@ -52,7 +52,7 @@ func AddTag(c *gin.Context) {
 		if !models.ExistTagByName(name) {
 			code = e.SUCCESS
 			err := models.AddTag(name, state, createdBy)
-			fmt.Printf("%+v \n",err)
+			fmt.Printf("%+v \n", err)
 		} else {
 			code = e.ERROR_EXIST_TAG
 		}
@@ -60,14 +60,14 @@ func AddTag(c *gin.Context) {
 	} else {
 		for _, err := range valid.Errors {
 			//logging.Info(err.Key, err.Message)
-			fmt.Printf("%+v",err)
+			fmt.Printf("%+v", err)
 			msg = err.Message
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code" : code,
-		"msg" : msg,
-		"data" : make(map[string]string),
+		"code": code,
+		"msg":  msg,
+		"data": make(map[string]string),
 	})
 }
 
@@ -87,7 +87,7 @@ func EditTag(c *gin.Context) {
 	valid.MaxSize(modifiedBy, 100, "modified_by").Message("修改人最长为100字符")
 	valid.MaxSize(name, 100, "name").Message("名称最长为100字符")
 	code := e.INVALID_PARAMS
-	if ! valid.HasErrors() {
+	if !valid.HasErrors() {
 		code = e.SUCCESS
 		if !models.ExistTagByName(name) {
 			if models.ExistTagByID(id) {
@@ -103,29 +103,30 @@ func EditTag(c *gin.Context) {
 			} else {
 				code = e.ERROR_NOT_EXIST_TAG
 			}
-		}else {
+		} else {
 			code = e.ERROR_EXIST_TAG
 		}
 
 	} else {
 		for _, err := range valid.Errors {
 			//logging.Info(err.Key, err.Message)
-			fmt.Printf("edit tag err: %+v",err)
+			fmt.Printf("edit tag err: %+v", err)
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code" : code,
-		"msg" : e.GetMsg(code),
-		"data" : make(map[string]string),
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": make(map[string]string),
 	})
 }
+
 //删除文章标签
 func DeleteTag(c *gin.Context) {
 	id := com.StrTo(c.Param("id")).MustInt()
 	valid := validation.Validation{}
 	valid.Min(id, 1, "id").Message("ID必须大于0")
 	code := e.INVALID_PARAMS
-	if ! valid.HasErrors() {
+	if !valid.HasErrors() {
 		code = e.SUCCESS
 		if models.ExistTagByID(id) {
 			models.DeleteTag(id)
@@ -135,12 +136,12 @@ func DeleteTag(c *gin.Context) {
 	} else {
 		for _, err := range valid.Errors {
 			//logging.Info(err.Key, err.Message)
-			fmt.Printf("del tag err: %+v",err)
+			fmt.Printf("del tag err: %+v", err)
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code" : code,
-		"msg" : e.GetMsg(code),
-		"data" : make(map[string]string),
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": make(map[string]string),
 	})
 }

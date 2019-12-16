@@ -6,11 +6,12 @@ import (
 	"tgin/middleware"
 	"tgin/pkg/setting"
 )
+
 func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-	gin.SetMode(setting.RunMode)
+	gin.SetMode(setting.ServerSetting.RunMode)
 	r.GET("/auth", api.GetAuth)
 	apiv1 := r.Group("/api/v1").Use(middleware.JWT())
 	{
