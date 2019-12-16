@@ -2,9 +2,11 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"tgin/controllers/api"
 	"tgin/middleware"
 	"tgin/pkg/setting"
+	"tgin/pkg/upload"
 )
 
 func InitRouter() *gin.Engine {
@@ -13,6 +15,10 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 	gin.SetMode(setting.ServerSetting.RunMode)
 	r.GET("/auth", api.GetAuth)
+	r.POST("/upload", api.UploadImage)
+	//静态访问图片资源
+	r.StaticFS("/upload/images", http.Dir(upload.GetImageFullPath()))
+
 	apiv1 := r.Group("/api/v1").Use(middleware.JWT())
 	{
 		//获取标签列表

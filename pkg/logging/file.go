@@ -21,6 +21,8 @@ func getLogFileName() string {
 
 func openLogFile(fileName, filePath string) (*os.File, error) {
 	dir, err := os.Getwd()
+	fmt.Println(dir)
+	fmt.Printf("fileName: %+v, filePath: %+v \n", fileName, filePath)
 	if err != nil {
 		return nil, fmt.Errorf("os.Getwd err: %v", err)
 	}
@@ -34,6 +36,7 @@ func openLogFile(fileName, filePath string) (*os.File, error) {
 		return nil, fmt.Errorf("file.IsNotExistMkDir src: %s, err: %v", src, err)
 	}
 	f, err := file.Open(src+fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	//f, err := file.Open("E:/goStd/src/tgin/runtime/logs/log20191216.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return nil, fmt.Errorf("fail to OpenFile :%v", err)
 	}
