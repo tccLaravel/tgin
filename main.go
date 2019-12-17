@@ -19,7 +19,6 @@ func init() {
 	setting.SetUp()
 	fmt.Println(setting.DatabaseSetting.Type)
 	models.SetUp()
-
 	logging.SetUp()
 }
 

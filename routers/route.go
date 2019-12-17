@@ -16,7 +16,7 @@ func InitRouter() *gin.Engine {
 	gin.SetMode(setting.ServerSetting.RunMode)
 	r.GET("/auth", api.GetAuth)
 	r.POST("/upload", api.UploadImage)
-	//静态访问图片资源
+	//静态访问图片资源,这里会生成一个静态路由地址
 	r.StaticFS("/upload/images", http.Dir(upload.GetImageFullPath()))
 
 	apiv1 := r.Group("/api/v1").Use(middleware.JWT())
