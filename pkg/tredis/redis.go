@@ -32,34 +32,34 @@ type Options struct {
 	Unmarshal   func(data []byte, v interface{}) error // 数据反序列化方法，默认使用json.Unmarshal序列化
 }
 
-func New(options Options) (*TCache, error) {
+func New() (*TCache, error) {
 	r := &TCache{}
-	if options.Network == "" {
-		options.Network = setting.RedisSetting.Addr
-	}
-	if options.Addr == "" {
-		options.Addr = setting.RedisSetting.Addr
-	}
-	if options.MaxIdle == 0 {
-		options.MaxIdle = setting.RedisSetting.MaxIdle
-	}
-	if options.IdleTimeout == 0 {
-		options.IdleTimeout = setting.RedisSetting.IdleTimeout
-	}
-	if options.Prefix == "" {
-		options.Prefix = setting.RedisSetting.Prefix
-	}
-	if options.Marshal == nil {
-		r.marshal = json.Marshal
-	}
-	if options.Unmarshal == nil {
-		r.unmarshal = json.Unmarshal
-	}
-	err := r.StartAndGC(options)
+	//if options.Network == "" {
+	//	options.Network = setting.RedisSetting.Addr
+	//}
+	//if options.Addr == "" {
+	//	options.Addr = setting.RedisSetting.Addr
+	//}
+	//if options.MaxIdle == 0 {
+	//	options.MaxIdle = setting.RedisSetting.MaxIdle
+	//}
+	//if options.IdleTimeout == 0 {
+	//	options.IdleTimeout = setting.RedisSetting.IdleTimeout
+	//}
+	//if options.Prefix == "" {
+	//	options.Prefix = setting.RedisSetting.Prefix
+	//}
+	//if options.Marshal == nil {
+	//	r.marshal = json.Marshal
+	//}
+	//if options.Unmarshal == nil {
+	//	r.unmarshal = json.Unmarshal
+	//}
+	err := r.StartAndGC()
 	return r, err
 }
 
-func (c *TCache) StartAndGC(options Options) error {
+func (c *TCache) StartAndGC() error {
 	pool := &redis.Pool{
 		MaxActive:   setting.RedisSetting.MaxActive,
 		MaxIdle:     setting.RedisSetting.MaxIdle,
@@ -76,7 +76,7 @@ func (c *TCache) StartAndGC(options Options) error {
 					return nil, err
 				}
 			}
-			if _, err := conn.Do("SELECT", setting.DatabaseSetting.Name); err != nil {
+			if _, err := conn.Do("SELECT", 0); err != nil {
 				_ = conn.Close()
 				return nil, err
 			}
@@ -90,15 +90,18 @@ func (c *TCache) StartAndGC(options Options) error {
 	}
 
 	c.pool = pool
+	c.marshal = json.Marshal
+	c.unmarshal = json.Unmarshal
 	c.closePool()
 	return nil
 }
 
 // Do 执行redis命令并返回结果。执行时从连接池获取连接并在执行完命令后关闭连接。
-func (c *TCache) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
+func (c *TCache) Do(commandName string, args ...interface{}) (interface{}, error) {
 	conn := c.pool.Get()
 	defer conn.Close()
-	return conn.Do(commandName, args)
+	//注意这里的写法  args... 不是 args 如果传args的话,相当于传递的参数是数组, args... 传递的是单个arg参数
+	return conn.Do(commandName, args...)
 }
 
 // getKey 将健名加上指定的前缀。
@@ -113,7 +116,7 @@ func (c *TCache) Get(key string) (interface{}, error) {
 
 // GetString 获取string类型的键值
 func (c *TCache) GetString(key string) (string, error) {
-	return String(c.Get(key))
+	return String(c.Do("GET", c.getKey(key)))
 }
 
 // GetInt 获取int类型的键值

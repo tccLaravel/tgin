@@ -10,9 +10,12 @@ import (
 	"tgin/models"
 	"tgin/pkg/logging"
 	"tgin/pkg/setting"
+	"tgin/pkg/tredis"
 	"tgin/routers"
 	"time"
 )
+
+var redis *tredis.TCache
 
 func init() {
 	//加在配置项,与配置项配置
@@ -20,6 +23,7 @@ func init() {
 	fmt.Println(setting.DatabaseSetting.Type)
 	models.SetUp()
 	logging.SetUp()
+	redis, _ = tredis.New()
 }
 
 func main() {
