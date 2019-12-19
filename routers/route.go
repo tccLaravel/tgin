@@ -14,7 +14,7 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	gin.SetMode(setting.ServerSetting.RunMode)
-	r.GET("/auth", api.GetAuth)
+	r.POST("/auth", api.GetAuth)
 	r.POST("/upload", api.UploadImage)
 	//静态访问图片资源,这里会生成一个静态路由地址
 	r.StaticFS("/upload/images", http.Dir(upload.GetImageFullPath()))
@@ -22,7 +22,7 @@ func InitRouter() *gin.Engine {
 	apiv1 := r.Group("/api/v1").Use(middleware.JWT())
 	{
 		//获取标签列表
-		apiv1.GET("/tags", api.GetTags)
+		apiv1.POST("/tag/lists", api.GetTags)
 		//新建标签
 		apiv1.POST("/tags", api.AddTag)
 		//更新指定标签
@@ -31,7 +31,7 @@ func InitRouter() *gin.Engine {
 		apiv1.DELETE("/tags/:id", api.DeleteTag)
 
 		//获取文章列表
-		apiv1.GET("/articles", api.GetArticles)
+		apiv1.POST("/articles/lists", api.GetArticles)
 		//获取指定文章
 		apiv1.GET("/articles/:id", api.GetArticle)
 		//新建文章

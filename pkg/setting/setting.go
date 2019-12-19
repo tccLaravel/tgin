@@ -32,6 +32,7 @@ type Server struct {
 var ServerSetting = &Server{}
 
 type Database struct {
+	DRunMode    bool
 	Type        string
 	User        string
 	Password    string
